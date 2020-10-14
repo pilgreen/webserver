@@ -29,11 +29,24 @@ func main() {
   // Run it
   port := ":" + Config.Port
   go func() {
-    log.Fatal(http.ListenAndServe(port, http.FileServer(http.Dir(Config.Directory))))
+    server := &http.Server {
+      Addr: port,
+      Handler: addCORS(http.FileServer(http.Dir(Config.Directory))),
+    }
+
+    log.Fatal(server.ListenAndServe())
     wg.Done()
   }()
 
   // Log it
   log.Printf("webserver started. go to http://localhost%s.", port)
   wg.Wait()
+}
+
+func addCORS(h http.Handler) http.HandlerFunc {
+  return func(w http.ResponseWriter, r *http.Request) {
+    w.Header().Add("Access-Control-Allow-Origin", "*")
+    w.Header().Add("Access-Control-Allow-Methods", "GET OPTIONS")
+    h.ServeHTTP(w, r)
+  }
 }
