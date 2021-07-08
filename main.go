@@ -23,7 +23,7 @@ func main() {
   }
 
   flag.StringVar(&Config.Directory, "d", wd, "root directory")
-  flag.StringVar(&Config.Port, "p", "1313", "webserver port")
+  flag.StringVar(&Config.Port, "p", "3000", "webserver port")
   flag.Parse()
 
   // Run it
