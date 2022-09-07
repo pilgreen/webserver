@@ -30,10 +30,11 @@ func main() {
   port := ":" + Config.Port
   go func() {
     root := http.Dir(Config.Directory)
+    fs := http.FileServer(root)
 
     server := &http.Server {
       Addr: port,
-      Handler: http.FileServer(root),
+      Handler: cors(fs),
     }
 
     log.Fatal(server.ListenAndServe())
@@ -43,4 +44,15 @@ func main() {
   // Log it
   log.Printf("webserver started at http://localhost%s.", port)
   wg.Wait()
+}
+
+/*
+Enable CORS for serving from multiple ports
+*/
+
+func cors(fs http.Handler) http.HandlerFunc {
+  return func (w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    fs.ServeHTTP(w, r)
+  }
 }
